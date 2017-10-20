@@ -20,7 +20,7 @@
  */
 #define IP "192.168.242.11"         //server IP
 #define PORT 1234                   //server Port Nr.
-
+#define PACKETSIZE 1400
 int main (int argc, char **argv)
 {
 
@@ -61,21 +61,41 @@ int main (int argc, char **argv)
     {
       printf ("Error sending data\n");
     }
-    char receiveBuffer[100] = {};
+    char *receiveBuffer = malloc (10000);
 
 
-    char *bigBuffer = malloc (10000);
-    char *current = bigBuffer;
+    //char *bigBuffer = malloc (10000);
+    char *current = receiveBuffer;
 
-    memcpy (current, receiveBuffer, 100);
-    current = current + 100;
+    //memcpy (current, receiveBuffer, 100);
 
-    ssize_t receiveResult = recv(sockFd, receiveBuffer, 100, 0);
+
+    ssize_t receiveResult = recv(sockFd, current, 1400, 0);
+    current = current + receiveResult;
+    int lengthOfMessage;
+    ssize_t messagePartSize = receiveResult;
+    memcpy (&lengthOfMessage,current,4);
+    if(lengthOfMessage > PACKETSIZE)
+    {
+      do
+      {
+        receiveResult = recv (sockFd, current, 1400, 0);
+        current = current + receiveResult;
+        messagePartSize = messagePartSize + receiveResult;
+      } while(messagePartSize < lengthOfMessage);
+      if(messagePartSize != lengthOfMessage)
+      {
+        printf("Invalid message\n");
+      }
+
+    }
+
+
     if(receiveResult < 0)
     {
       printf("Error receiving message\n");
     }
-    printf("Message from server: %s\n",receiveBuffer);
+    printf("Message from server: %s\n",receiveBuffer+4);
     counter++;
   }
 
