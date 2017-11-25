@@ -114,7 +114,7 @@ int main (int argc, char **argv)
      */
     socklen_t lengthOfClientAddress = sizeof (clientaddress);
     size_t lengthOfText = strlen (TEXT);
-    memcpy (sendBuffer, &lengthOfText, 4);
+    memcpy (sendBufferCursor, &lengthOfText, 4);
     sendBufferCursor = sendBufferCursor + 4;
     char *current = TEXT;
     int sendBufferSize = 1400;
@@ -143,6 +143,8 @@ int main (int argc, char **argv)
                                      (struct sockaddr *) &clientaddress,
                                      lengthOfClientAddress);
       firstIteration = 0;
+      sendBufferCursor =sendBuffer;
+      current =current+sendSize-placeHolder;
 
     } while (totalSendSize < lengthOfText);
 

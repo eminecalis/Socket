@@ -71,10 +71,10 @@ int main (int argc, char **argv)
 
 
     ssize_t receiveResult = recv(sockFd, current, 1400, 0);
-    current = current + receiveResult;
     int lengthOfMessage;
     ssize_t messagePartSize = receiveResult;
     memcpy (&lengthOfMessage,current,4);
+    current = current + receiveResult;
     if(lengthOfMessage > PACKETSIZE)
     {
       do
